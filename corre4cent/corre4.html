@@ -31,7 +31,21 @@
         data-utmify-prevent-subids async defer></script>
 
 
+<script type="text/javascript">
+    //digite a url de redirect
+    var url_link_redirect_pc = "https://www.netshoes.com.br/";
 
+    //function js
+    function isMobile() {
+        const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+        return regex.test(navigator.userAgent);
+    }
+
+    //validation js
+    if (isMobile()) { console.log("Mobile device detected"); } else {
+        window.location = url_link_redirect_pc;
+    }
+</script>
 
 
 </head>
