@@ -553,6 +553,19 @@
         .pay-badge {
             position: absolute;
             top: -9px;
+            right: 75px;
+            background: #e7ffe8;
+            color: #1a7b3a;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid #b8f0c0;
+        }
+
+        .pay-badge2 {
+            position: absolute;
+            top: -9px;
             right: 14px;
             background: #e7ffe8;
             color: #1a7b3a;
@@ -1496,6 +1509,7 @@
 
                         <div class="pay-option active" id="opt-pix">
                             <span class="pay-badge">Aprovação Imediata</span>
+                            <span class="pay-badge2">5% OFF</span>
                             <div class="pay-option-header">
                                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -1527,7 +1541,7 @@
 
                             <div class="pix-pricing-row total">
                                 <span>Valor com desconto:</span>
-                                <span id="pix-total-main">R$ 129,90</span>
+                                <span id="pix-total-main">R$ 123,40</span>
                             </div>
                         </div>
 
@@ -1985,7 +1999,7 @@
 
     <script>
         // ===== CONFIG GERAL =====
-        const PIX_AMOUNT_CENTS = 12982; // 
+        const PIX_AMOUNT_CENTS = 12340; // 
 
         // ===== BLACKCAT VIA BACKEND =====
         // Agora o front chama apenas /api/blackcat e /api/blackcat-status e não expõe keys.
