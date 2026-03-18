@@ -14,35 +14,29 @@ export default async function handler(req, res) {
 
         const payload = {
             request: {
-                amount: Math.round(Number(body.amount) * 100),
+                amount: Number(body.amount),
 
-                paymentMethod: "PIX",
+                paymentMethod: "pix",
 
                 metadata: {
-                    orderId: body.external_id || `pedido_${Date.now()}`
+                    orderId: body.externalRef || `pedido_${Date.now()}`
                 },
 
                 customer: {
-                    name: body.name,
-                    email: body.email,
+                    name: body.customer?.name,
+                    email: body.customer?.email,
 
                     document: {
-                        number: String(body.document || "").replace(/\D/g, ""),
-                        type: "cpf"
+                        number: String(body.customer?.document?.number || "").replace(/\D/g, ""),
+                        type: body.customer?.document?.type || "cpf"
                     },
 
-                    phone: String(body.phone || "").replace(/\D/g, "")
+                    phone: String(body.customer?.phone || "").replace(/\D/g, "")
                 },
 
-                items: [
-                    {
-                        title: body.description || "Produto",
-                        quantity: 1,
-                        unitPrice: Math.round(Number(body.amount) * 100)
-                    }
-                ],
+                items: body.items || [],
 
-                externalId: body.external_id,
+                externalId: body.externalRef,
 
                 postbackUrl: `${process.env.PUBLIC_BASE_URL}/api/freepay-webhook`
             }
