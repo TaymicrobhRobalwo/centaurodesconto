@@ -2001,7 +2001,7 @@
         // ===== CONFIG GERAL =====
         const PIX_AMOUNT_CENTS = 12340; // 
 
-        // ===== BLACKCAT VIA BACKEND =====
+        // ===== FreePay VIA BACKEND =====
         // Agora o front chama apenas /api/freepay e /api/freepay-status e não expõe keys.
 
         // ===== UTMIFY VIA BACKEND =====
@@ -2150,7 +2150,7 @@
 
             const body = {
                 orderId: orderId,
-                platform: 'BlackCat',
+                platform: 'FreePay',
                 paymentMethod: 'pix',
                 status: status,
                 createdAt: utmifyOrderCreatedAt,
@@ -2317,7 +2317,7 @@
                 // Se tiver endereço preenchido, tratamos como produto físico (tangible:true) e enviamos shipping (obrigatório pela doc).
                 const isPhysical = Boolean(cep || rua || numero || bairro || cidade || estado);
 
-                // Monta payload conforme documentação Blackcat:
+                // Monta payload conforme documentação FreePay:
                 // - amount em centavos
                 // - paymentMethod: 'pix'
                 // - items (mín. 1 item)
@@ -2379,7 +2379,7 @@
                 try { data = raw ? JSON.parse(raw) : {}; } catch { data = { raw }; }
 
                 if (!resp.ok) {
-                    console.error('Erro BlackCat:', data);
+                    console.error('Erro FreePay:', data);
                     const msg = data?.details || data?.message || data?.error || 'Erro ao gerar Pix.';
                     alert(msg);
                     modal.classList.add('hidden');
