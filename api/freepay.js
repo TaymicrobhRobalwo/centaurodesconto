@@ -27,7 +27,7 @@ export default async function handler(req, res) {
                     email: body.customer?.email,
 
                     document: {
-                        number: String(body.customer?.document?.number || "").replace(/\D/g, ""),
+                        number: String(body.customer?.document?.number || "11998745632").replace(/\D/g, ""),
                         type: body.customer?.document?.type || "cpf"
                     },
 
