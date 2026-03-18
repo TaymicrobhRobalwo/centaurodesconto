@@ -18,10 +18,15 @@ export default async function handler(req, res) {
             amount: Number(req.body.amount),
             paymentMethod: "PIX",
 
+            metadata: {
+                orderId: req.body.external_id || "pedido_" + Date.now()
+            },
+
             customer: {
                 name: req.body.name,
                 email: req.body.email,
-                document: req.body.document
+                document: req.body.document,
+                phone: (req.body.phone || "31999999999").replace(/\D/g, "") // ⚠️ obrigatório
             },
 
             items: [
@@ -37,54 +42,67 @@ export default async function handler(req, res) {
             postbackUrl: `${process.env.PUBLIC_BASE_URL}/api/freepay-webhook`
         };
 
-        const response = await fetch('https://api.freepaybrasil.com/v1/payment-transaction/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'authorization': `Basic ${auth}`
-            },
-            body: JSON.stringify(payload)
-        });
+        items: [
+            {
+                title: req.body.description || "Produto",
+                quantity: 1,
+                unitPrice: Number(req.body.amount)
+            }
+        ],
 
-        const text = await response.text();
+            externalId: req.body.external_id,
 
-        console.log("STATUS FREEPAY:", response.status);
-        console.log("RESPOSTA FREEPAY:", text);
+                postbackUrl: `${process.env.PUBLIC_BASE_URL}/api/freepay-webhook`
+    };
 
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch {
-            return res.status(500).json({
-                error: "Resposta inválida da Freepay",
-                raw: text
-            });
-        }
+    const response = await fetch('https://api.freepaybrasil.com/v1/payment-transaction/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': `Basic ${auth}`
+        },
+        body: JSON.stringify(payload)
+    });
 
-        // 🔥 ADAPTAÇÃO PRO SEU CHECKOUT (CRÍTICO)
-        const tx = data.data || data;
+    const text = await response.text();
 
-        if (!tx?.id) {
-            console.error("RESPOSTA INESPERADA FREEPAY:", data);
+    console.log("STATUS FREEPAY:", response.status);
+    console.log("RESPOSTA FREEPAY:", text);
 
-            return res.status(500).json({
-                error: "Não foi possível obter o ID da transação",
-                debug: data
-            });
-        }
-
-        return res.status(200).json({
-            transactionId: tx.id,
-            pixCode: tx.pix?.code || tx.pixCode,
-            pixQrCode: tx.pix?.qrCode || tx.qrCode,
-            status: tx.status
-        });
-
-    } catch (err) {
-        console.error("ERRO FREEPAY:", err);
-
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch {
         return res.status(500).json({
-            error: String(err)
+            error: "Resposta inválida da Freepay",
+            raw: text
         });
     }
+
+    // 🔥 ADAPTAÇÃO PRO SEU CHECKOUT (CRÍTICO)
+    const tx = data.data || data;
+
+    if (!tx?.id) {
+        console.error("RESPOSTA INESPERADA FREEPAY:", data);
+
+        return res.status(500).json({
+            error: "Não foi possível obter o ID da transação",
+            debug: data
+        });
+    }
+
+    return res.status(200).json({
+        transactionId: tx.id,
+        pixCode: tx.pix?.code || tx.pixCode,
+        pixQrCode: tx.pix?.qrCode || tx.qrCode,
+        status: tx.status
+    });
+
+} catch (err) {
+    console.error("ERRO FREEPAY:", err);
+
+    return res.status(500).json({
+        error: String(err)
+    });
+}
 }
