@@ -31,7 +31,7 @@ export default async function handler(req, res) {
                         type: body.customer?.document?.type || "cpf"
                     },
 
-                    phone: String(body.customer?.phone || "").replace(/\D/g, "")
+                    phone: String(body.customer?.phone || "11998745632").replace(/\D/g, "")
                 },
 
                 items: body.items || [],
