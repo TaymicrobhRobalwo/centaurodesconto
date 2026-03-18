@@ -2002,7 +2002,7 @@
         const PIX_AMOUNT_CENTS = 12340; // 
 
         // ===== BLACKCAT VIA BACKEND =====
-        // Agora o front chama apenas /api/blackcat e /api/blackcat-status e não expõe keys.
+        // Agora o front chama apenas /api/freepay e /api/freepay-status e não expõe keys.
 
         // ===== UTMIFY VIA BACKEND =====
         // O token agora fica só no backend, aqui chamamos /api/utmify
@@ -2222,7 +2222,7 @@
         async function consultarStatusPix() {
             if (!pixTransactionId) return;
             try {
-                const resp = await fetch(`/api/blackcat-status?transaction_id=${encodeURIComponent(pixTransactionId)}`, {
+                const resp = await fetch(`/api/freepay-status?transaction_id=${encodeURIComponent(pixTransactionId)}`, {
                     method: 'GET'
                 });
                 const data = await resp.json();
@@ -2321,7 +2321,7 @@
                 // - amount em centavos
                 // - paymentMethod: 'pix'
                 // - items (mín. 1 item)
-                // - customer (sem expor API key no front; quem assina é o /api/blackcat no backend)
+                // - customer (sem expor API key no front; quem assina é o /api/freepay no backend)
                 // - shipping obrigatório quando tangible:true
                 utmifyTrackingParams = getTrackingParams();
 
@@ -2329,7 +2329,7 @@
                     amount: PIX_AMOUNT_CENTS,
                     currency: 'BRL',
                     paymentMethod: 'pix',
-                    postbackUrl: `${location.origin}/api/blackcat-webhook`,
+                    postbackUrl: `${location.origin}/api/freepay-webhook`,
                     externalRef: pedidoId,
                     metadata: `{ orderId: "${pedidoId}" }`,
 
@@ -2368,7 +2368,7 @@
                     } : {})
                 };
 
-                const resp = await fetch('/api/blackcat', {
+                const resp = await fetch('/api/freepay', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

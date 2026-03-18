@@ -9,7 +9,7 @@ export default async function handler(req, res) {
             return res.status(500).json({ success: false, message: 'Missing BLACKCAT_API_KEY env var' });
         }
 
-        const upstream = await fetch('https://api.blackcatpagamentos.online/api/sales/create-sale', {
+        const upstream = await fetch('https://api.freepaybrasil.com/v1/payment-transaction/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
