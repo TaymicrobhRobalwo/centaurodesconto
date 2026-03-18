@@ -4,14 +4,18 @@ export default async function handler(req, res) {
     }
 
     try {
-        const apiKey = process.env.FREEPAY_API_KEY;
+        const publicKey = process.env.FREEPAY_PUBLIC_KEY;
+        const secretKey = process.env.FREEPAY_SECRET_KEY;
 
-        if (!apiKey) {
-            return res.status(500).json({ error: 'Missing FREEPAY_API_KEY' });
+        if (!publicKey || !secretKey) {
+            return res.status(500).json({ error: 'Missing Freepay credentials' });
         }
 
+        // 🔐 AUTH CORRETA
+        const auth = Buffer.from(`${publicKey}:${secretKey}`).toString('base64');
+
         const payload = {
-            amount: Number(req.body.amount), // geralmente em reais
+            amount: Number(req.body.amount),
             paymentMethod: "PIX",
 
             customer: {
@@ -37,7 +41,7 @@ export default async function handler(req, res) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': apiKey // ⚠️ MUITOS gateways NÃO usam Bearer
+                'authorization': `Basic ${auth}`
             },
             body: JSON.stringify(payload)
         });
@@ -57,20 +61,30 @@ export default async function handler(req, res) {
             });
         }
 
-        // 🔥 NORMALIZAÇÃO PRO SEU CHECKOUT
+        // 🔥 ADAPTAÇÃO PRO SEU CHECKOUT (CRÍTICO)
+        const tx = data.data || data;
+
+        if (!tx?.id) {
+            console.error("RESPOSTA INESPERADA FREEPAY:", data);
+
+            return res.status(500).json({
+                error: "Não foi possível obter o ID da transação",
+                debug: data
+            });
+        }
+
         return res.status(200).json({
-            transactionId: data.id || data.transactionId,
-            pixCode: data.pixCode || data.pix_code,
-            pixQrCode: data.pixQrCode || data.qrCode || data.qr_code,
-            status: data.status
+            transactionId: tx.id,
+            pixCode: tx.pix?.code || tx.pixCode,
+            pixQrCode: tx.pix?.qrCode || tx.qrCode,
+            status: tx.status
         });
 
     } catch (err) {
         console.error("ERRO FREEPAY:", err);
 
         return res.status(500).json({
-            error: String(err),
-            details: "Falha ao conectar com a Freepay"
+            error: String(err)
         });
     }
 }
