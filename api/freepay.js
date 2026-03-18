@@ -13,31 +13,39 @@ export default async function handler(req, res) {
         const body = req.body || {};
 
         const payload = {
-            amount: Number(body.amount || 0),
-            paymentMethod: "PIX",
+            request: {
+                amount: Math.round(Number(body.amount) * 100),
 
-            metadata: {
-                orderId: body.external_id || `pedido_${Date.now()}`
-            },
+                paymentMethod: "PIX",
 
-            customer: {
-                name: String(body.name || "Cliente"),
-                email: String(body.email || "email@email.com"),
-                document: String(body.document || "00000000000"),
-                phone: String(body.phone || "31999999999").replace(/\D/g, "")
-            },
+                metadata: {
+                    orderId: body.external_id || `pedido_${Date.now()}`
+                },
 
-            items: [
-                {
-                    title: String(body.description || "Produto"),
-                    quantity: 1,
-                    unitPrice: Number(body.amount || 0)
-                }
-            ],
+                customer: {
+                    name: body.name,
+                    email: body.email,
 
-            externalId: body.external_id || `pedido_${Date.now()}`,
+                    document: {
+                        number: String(body.document || "").replace(/\D/g, ""),
+                        type: "cpf"
+                    },
 
-            postbackUrl: `${process.env.PUBLIC_BASE_URL}/api/freepay-webhook`
+                    phone: String(body.phone || "").replace(/\D/g, "")
+                },
+
+                items: [
+                    {
+                        title: body.description || "Produto",
+                        quantity: 1,
+                        unitPrice: Math.round(Number(body.amount) * 100)
+                    }
+                ],
+
+                externalId: body.external_id,
+
+                postbackUrl: `${process.env.PUBLIC_BASE_URL}/api/freepay-webhook`
+            }
         };
 
         const response = await fetch('https://api.freepaybrasil.com/v1/payment-transaction/create', {
